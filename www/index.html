@@ -1,0 +1,529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+	<head>
+		<link async rel="stylesheet" href="bootstrap.min.css" type="text/css" />
+		<link async rel="stylesheet" href="/font-awesome-4.7.0/font-awesome-4.7.0/css/font-awesome.min.css" type="text/css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link async rel="stylesheet" href="w3.css" type="text/css" />
+		<link rel="stylesheet" href="yggdrasil.css" type="text/css" />
+		<script src="yggdrasil.js" type="text/javascript"> </script>
+		<script>
+			//register the service worker
+			if ('serviceWorker' in navigator) {
+			  window.addEventListener('load', function() {
+				navigator.serviceWorker.register('sw.js').then(function(registration) {
+				  // Registration was successful
+				  console.log('ServiceWorker registration successful with scope: ', registration.scope);
+				}).catch(function(err) {
+				  // registration failed :(
+				  console.log('ServiceWorker registration failed: ', err);
+				});
+			  });
+			}
+		</script>
+		<script src="jquery.min.js" type="text/javascript"> </script>
+		<script src="bootstrap.min.js" type="text/javascript"> </script>
+		<!-- ****** faviconit.com favicons ****** -->
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="icon" sizes="16x16 32x32 64x64" href="/favicon.ico" />
+		<link rel="icon" type="image/png" sizes="196x196" href="/favicons/favicon-192.png" />
+		<link rel="icon" type="image/png" sizes="160x160" href="/favicons/favicon-160.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96.png" />
+		<link rel="icon" type="image/png" sizes="64x64" href="/favicons/favicon-64.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16.png" />
+		<link rel="apple-touch-icon" href="/favicons/favicon-57.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/favicons/favicon-114.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/favicons/favicon-72.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/favicons/favicon-144.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/favicons/favicon-60.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/favicons/favicon-120.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/favicons/favicon-76.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/favicons/favicon-152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicons/favicon-180.png" />
+		<meta name="msapplication-TileColor" content="#FFFFFF" />
+		<meta name="msapplication-TileImage" content="/favicons/favicon-144.png" />
+		<meta name="msapplication-config" content="/browserconfig.xml" />
+		<!-- ****** faviconit.com favicons ****** -->
+		<title>Yggdrasil Projects</title>
+		<meta name="theme-color" content="#5f5eaa">
+		<link rel="manifest" href="/manifest.json">
+	</head>
+
+	<body>
+		<div id="mySidenav" class="sidenav">
+		  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		  <a href="#">About Jeff Davies</a>
+		  <a href="https://www.linkedin.com/in/jeff-davies-b13a74b0/">LinkedIn</a>
+		  <a href="https://gitlab.com/hipparchus2000">GitLab</a>
+		  <a href="https://stackoverflow.com/users/5292841/jeff-davies">StackOverflow</a>
+		  <a href="#" onclick="navigate('/')">Projects</a>
+		  <a href="#" onclick="navigate('/blog')">My Blog</a>
+		  <a href="#" id="loginBtn">Login</a>
+		  <a href="#" id="logoutBtn">Logout</a>
+
+		</div>
+
+		<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
+		
+		<div id="tabs">
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onclick="navigate('/project')">[ projects ]</a>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onclick="navigate('/blog')">[ blog ]</a>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onclick="navigate('/task')">[ kanban ]</a>
+		<div id="sysinfo" class="pull-right"></div>
+		</div>
+	  
+		<div class="container-fluid"  data-role="page" id="pageone">
+			<div class="smallcaps" data-role="header">
+			  <center>
+				<h1 id="pageTitle">{{pageTitle}}</h1>
+			  </center>
+			</div>
+
+			<div class="row">
+				<div class="col-md-1">
+					<a class="btn btn-primary" onclick="addButton()" href="#" id="addButton">Add</a>
+				</div>
+				<!--<div class="col-md-1">
+					<a class="btn btn-primary" onclick="navigate('/kanbanslot')" href="#" id="slotButton">Slots</a>
+				</div>-->
+				<div class="col-md-1">
+					<a class="btn btn-primary" onclick="admin()" href="#" id="adminButton">Admin</a>
+				</div>
+			</div>
+
+			<div id="root">
+			</div>
+
+			<div id="templates" class="hidden">
+			
+				<div id="card-template" class="w3-third w3-section" ondrop="drop(event)" ondragover="allowDrop(event)">
+					<div id="{{id}}" class="w3-card-4 w3-light-grey w3-round-large" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+					  <div class="w3-container w3-center">
+  						<input type="hidden" name="id" value="{{id}}" id="projectId">
+						<button type="button" class="btn btn-danger marginTop5">{{title}}</button>
+						<p>{{description}} &copy; {{year}}</p>
+						<div class="w3-section">
+						  <a class="btn btn-primary" href="{{pdfUrl}}">PDF</a>
+						  <a class="btn btn-warning" role="button" onclick="loadHtmlFragmentToRoot('{{url}}')">Documents</a>
+						  <a class="btn btn-info" role="button" href="{{codeUrl}}">Code on Gitlab</a>
+						  <a class="btn btn-info" role="button" href="{{siteUrl}}">Live Site</a>{{editButton}}
+						</div>
+					  </div>
+					</div>
+				</div>
+				
+				<div id="cardRow-template" class="w3-row-padding w3-theme">
+				</div>
+			  
+				<div id="trash-template" class="w3-third w3-section" ondrop="drop(event)" ondragover="allowDrop(event)">
+					<div id="{{id}}" class="w3-card-4 w3-light-grey w3-round-large" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+					  <div class="w3-container w3-center">
+  						<input type="hidden" name="id" value="{{id}}" id="projectId">
+						<button type="button" class="btn btn-danger marginTop5">{{wasteType}}</button>
+						
+						<div class="row">
+							<div class="col-md-6">bags:</div><div class="col-md-6">{{numberOfBags}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">max hours from now:</div><div class="col-md-6">{{maxNumberOfHoursFromNow}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">location:</div><div class="col-md-6">{{location}}</div>
+						</div>
+						
+						<div class="w3-section">
+						  
+							<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+								<input type="hidden" name="cmd" value="_s-xclick">
+								<input type="hidden" name="hosted_button_id" value="6QFTG33VZN9S8">
+								<table>
+								<tr><td><input type="hidden" name="on0" value="Pay It Forward Awesome Badge">Pay It Forward Awesome Badge</td></tr><tr><td><select name="os0">
+									<option value="Single">Single &#163;5.00 GBP
+									<option value="Pack of 10">Two Bags &#163;8.00 GBP
+									<option value="Pack of 100">Three bages &#163;12.00 GBP
+								</select> </td></tr>
+								</table>
+								<input type="hidden" name="currency_code" value="GBP">
+								<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+								<img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+							</form>
+							{{editButton}}
+						</div>
+					  </div>
+					</div>
+				</div>
+
+				<div id="blog-template" class="row marginTop5">
+					<div class="col-sm-12">
+						<div id="{{id}}" class="w3-card-4 w3-light-grey w3-round-large" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+							<div class="w3-container">
+								<div class="row">
+									<div class="col-sm-1">
+										<a class="btn btn-info marginTop5">{{date}}</a>
+									</div>
+									<div class="col-sm-11">
+										<input type="hidden" name="id" value="{{id}}" id="storyId">
+										<h3>{{storyName}}</h3> 
+										<div class="blogStory">{{storyText}}</div>{{editButton}}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="kanban-task-template" class="w3-third w3-section marginTop5" >
+					<div id="{{id}}" class="w3-card-2 w3-white w3-round-medium kanban-card" draggable="true" ondragstart="drag(event)" ondrop="false" ondragover="false">
+						<div class="w3-container w3-center">
+							<input type="hidden" name="id" value="{{id}}" id="taskId">
+							<span class="badge pull-left">{{storyName}}</span> 
+							<p>{{storyText}} </p> {{editButton}}
+						</div>
+					</div>
+				</div>
+
+				<div id="kanban-heading-template" class="w3-third w3-section marginTop5" >
+					<div id="{{id}}" class="w3-card-2 w3-white w3-round-medium kanban-card" draggable="true" ondragstart="drag(event)" ondrop="false" ondragover="false">
+						<div class="w3-container w3-center">
+							<input type="hidden" name="id" value="{{id}}" id="taskId">
+							<h3>{{storyName}}</h3> {{editButton}}
+							<p>{{storyText}} </p>
+						</div>
+					</div>
+				</div>
+
+				
+				<div id="kanban-template" class="row">
+					<table>
+						<tr id="kanban-slots" class="kanban-slot">
+						</tr>
+					</table>
+				</div>
+
+				<div id="kanban-slot-template" class="col-lg-2 w3-light-grey w3-round-medium marginTop5 kanban-slot" ondrop="drop(event)" ondragover="allowDrop(event)">
+					<td width="300" id="{{id}}">{{cards}}</td>
+				</div>
+			
+				<div id="user-template" class="row marginTop5">
+					<div class="col-sm-12">
+						<div class="row">
+							<input type="hidden" name="id" value="{{id}}" id="userId">
+							<div class="col-sm-6">
+								{{editButton}} {{username}}
+							</div>
+						</div>
+					</div>
+				</div>
+			
+				<div id="kanbanslot-template" class="row marginTop5">
+					<div class="col-sm-12">
+						<div class="row">
+							<input type="hidden" name="id" value="{{id}}" id="slotId">
+							<div class="col-sm-6">
+								{{editButton}} {{slotName}}
+							</div>
+						</div>
+					</div>
+				</div>
+			
+				<div id="edit-project-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input type="hidden" name="id" value="{{id}}" id="projectEditId">
+						<div class="form-group">
+							<label class="control-label">Project Name</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectName" value="" id="editProjectProjectName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Description</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectDescription" id="editProjectProjectDescription">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Year</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectDescription" id="editProjectProjectYear">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label">Live Url or Download Page</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectUrl" id="editProjectProjectUrl">
+							</div>
+						</div>
+						  <div class="form-group">
+							<label class="control-label">Code Url</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectCodeUrl" id="editProjectProjectCodeUrl">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">PDF Url</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editProjectProjectPdfUrl" id="editProjectProjectPdfUrl">
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+
+					</div>
+					
+				</div>
+ 
+				<div id="edit-blog-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input type="hidden" name="id" value="{{id}}" id="blogEditId">
+						<div class="form-group">
+							<label class="control-label">Story Name</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editBlogStoryname" value="" id="editBlogStoryname">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Story Text</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editBlogStorytext" id="editBlogStorytext">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Date</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editBlogStorytext" id="editBlogStorydate">
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" id="editBlogSaveChangesButton" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="edit-task-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input readonly name="id" value="{{id}}" id="taskEditId" />
+						<div class="form-group">
+							<label class="control-label">Project</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editTaskStoryname" value="" id="editTaskStoryname">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Description</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editTaskStorytext" id="editTaskStorytext">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Slot</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editTaskSlot" id="editTaskSlot">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="edit-user-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input type="hidden" name="id" value="{{id}}" id="userEditId">
+						<div class="form-group">
+							<label class="control-label">User Name</label>
+							<div>
+								<input type="email" class="form-control input-lg" name="userEditUsername" value="" id="userEditUsername">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Password</label>
+							<div>
+								<input type="password" class="form-control input-lg" name="userEditPassword" id="userEditPassword">
+							</div>
+						</div>
+						 <div class="form-group">
+							<label class="control-label">Roles</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="userEditRoles" id="userEditRoles">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="edit-slot-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input type="hidden" name="id" value="{{id}}" id="kanbanslotEditId">
+						<div class="form-group">
+							<label class="control-label">Order</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editSlotslotOrder" value="" id="editSlotslotOrder">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Name</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editSlotslotName" id="editSlotslotName">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="edit-trash-template" class="row">
+					<div class="col-md-6">
+						<div id="validationResult">
+							<div>
+							</div>
+						</div>
+						<input type="hidden" name="id" value="{{id}}" id="trashEditId">
+						<div class="form-group">
+							<label class="control-label">Location</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editTrashTrashName" value="" id="editTrashTrashLocation">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Waste Type</label>
+							<div>
+								<input type="text" class="form-control input-lg" name="editTrashTrashWasteType" id="editTrashTrashWasteType">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Number of Bags</label>
+							<div>
+								<input type="number" class="form-control input-lg" name="editTrashTrashNumberOfBags" id="editTrashTrashNumberOfBags">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Max Number of Hours From Now</label>
+							<div>
+								<input type="number" class="form-control input-lg" name="editTrashTrashMaxNumberOfHoursFromNow" id="editTrashTrashMaxNumberOfHoursFromNow">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>
+								<button type="submit" class="btn btn-success" onclick="cancelChanges()">Cancel</button>
+							</div>
+						</div>
+
+					</div>
+					
+				</div>
+				
+			</div> <!-- templates -->
+
+			<!-- Login -->
+			<div id="loginModal" class="modal">
+				<div class="modal-content">
+					<span id="loginClose"><i class="fa fa-times fa-3x pull-right" aria-hidden="true"></i></span>
+					<div>
+					   <div class="form-group">
+								<div id="loginResult">
+								<label class="control-label">Email Address</label>
+								<div>
+									<input type="email" class="form-control input-lg" name="email" value="" id="username">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label">Password</label>
+								<div>
+									<input type="password" class="form-control input-lg" name="password" id="password">
+								</div>
+							</div>
+							<div class="form-group">
+								<div>
+									<button type="submit" class="btn btn-success" onclick="login()">Login</button>
+								</div>
+							</div>
+							<div class="form-group">
+								<div id="loginStatus">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		</div>
+
+	</body>
+</html>
